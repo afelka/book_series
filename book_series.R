@@ -72,3 +72,16 @@ data[i, "image_name"] <- paste0(gsub(" ","_",str_to_lower(gsub("[^[:alnum:][:spa
 download.file(image_url, destfile = data$image_name[i] ,mode = "wb")
   
 }
+
+# create a dataset with first book from each series and keep only series and no_of_ratings
+first_book_of_series <- data %>% filter(book_number == 1) %>% droplevels() %>%
+                        select(series, no_of_ratings) %>% 
+                        rename(first_book_no_of_ratings = no_of_ratings)
+
+#merge with all books and create index by dividing no_of_ratings by first_book_no_of_ratings
+data2 <- data %>% left_join(first_book_of_series, by = "series") %>% 
+                  mutate(index = round((as.numeric(no_of_ratings) / 
+                                        as.numeric(first_book_no_of_ratings))*100,0))
+
+
+
