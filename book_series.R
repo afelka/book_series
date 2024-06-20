@@ -91,6 +91,15 @@ data2 <- data %>% left_join(first_book_of_series, by = "series") %>%
 data2 <- data2 %>%
   mutate(scaled_index = round(((index - min(index)) / (max(index) - min(index)))/20,4),
          label = ifelse(book_number > 1, paste0("Index: ", index), NA)) 
+
+# Calculate total ratings per series
+series_ratings <- data2 %>%
+  group_by(series) %>%
+  summarise(total_ratings = sum(as.numeric(no_of_ratings), na.rm = TRUE)) %>%
+  arrange(total_ratings)  
+
+# Reorder series based on total ratings
+data2$series <- factor(data2$series, levels = series_ratings$series)
   
 #Create ggplot2
 gg <- ggplot(data2, aes(x = book_number, y = series)) +
@@ -99,11 +108,14 @@ gg <- ggplot(data2, aes(x = book_number, y = series)) +
   theme_classic() +
   scale_x_continuous(breaks = seq(1, max(data2$book_number), 1),
                      labels = scales::ordinal_format()) + 
-  labs(title = "No of Goodreads Ratings Index per Books Published within Different Book Series",
+  labs(title = "Goodreads Ratings Index per Books Published within Different Book Series",
+       subtitle = "Example: 1st Book of Harry Potter has 10 million reviews = Index 100, 2nd book has 3.9 million reviews = Index 39",
     x = "Book Number", y = "Series Name") +
   theme(axis.text.y = element_text(size = 8),
         axis.text.x = element_text(size = 8),
-        axis.title = element_text(size = 10))
+        axis.title = element_text(size = 10),
+        plot.subtitle = element_text(size = 6),
+        plot.title = element_text(size = 12))
 
 #Save the plot
 ggsave("goodreads_ratings_index_per_book_series.png", plot = gg, width = 8, height = 5, bg = "white")
