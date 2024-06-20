@@ -99,7 +99,7 @@ gg <- ggplot(data2, aes(x = book_number, y = series)) +
   theme_classic() +
   scale_x_continuous(breaks = seq(1, max(data2$book_number), 1),
                      labels = scales::ordinal_format()) + 
-  labs(title = "No of Goodreads Ratings Index per Book Series per Books Published",
+  labs(title = "No of Goodreads Ratings Index per Books Published within Different Book Series",
     x = "Book Number", y = "Series Name") +
   theme(axis.text.y = element_text(size = 8),
         axis.text.x = element_text(size = 8),
