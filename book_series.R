@@ -95,7 +95,7 @@ data2 <- data2 %>%
 #Create ggplot2
 gg <- ggplot(data2, aes(x = book_number, y = series)) +
   geom_image(aes(image = image_name), size = data2$scaled_index) +
-  geom_text(aes(label = label), vjust = -2.5, hjust = 0.5, size = 3, na.rm = TRUE)  +
+  geom_text(aes(label = label), vjust = 2.1, hjust = 0.5, size = 3, na.rm = TRUE)  +
   theme_classic() +
   scale_x_continuous(breaks = seq(1, max(data2$book_number), 1),
                      labels = scales::ordinal_format()) + 
@@ -106,4 +106,4 @@ gg <- ggplot(data2, aes(x = book_number, y = series)) +
         axis.title = element_text(size = 10))
 
 #Save the plot
-ggsave( "goodreads_ratings_index_per_book_series.png",plot = gg, bg="white")
+ggsave("goodreads_ratings_index_per_book_series.png", plot = gg, width = 8, height = 5, bg = "white")
