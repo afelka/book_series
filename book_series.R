@@ -1,9 +1,12 @@
+#loading libraries
 library(readxl)
 library(rvest)
 library(dplyr)
 library(tidyr)
 library(RSelenium)
 library(stringr)
+library(ggplot2)
+library(ggimage)
 
 ### Setup Selenium with the newest chrome version ### 
 ### follow this answer about how to download latest chromedriver
@@ -81,7 +84,26 @@ first_book_of_series <- data %>% filter(book_number == 1) %>% droplevels() %>%
 #merge with all books and create index by dividing no_of_ratings by first_book_no_of_ratings
 data2 <- data %>% left_join(first_book_of_series, by = "series") %>% 
                   mutate(index = round((as.numeric(no_of_ratings) / 
-                                        as.numeric(first_book_no_of_ratings))*100,0))
+                                        as.numeric(first_book_no_of_ratings))*100,0)) %>%
+                  filter(index >=10)
 
+# create scaled_index for size of images and label
+data2 <- data2 %>%
+  mutate(scaled_index = round(((index - min(index)) / (max(index) - min(index)))/20,4),
+         label = ifelse(book_number > 1, paste0("Index: ", index), NA)) 
+  
+#Create ggplot2
+gg <- ggplot(data2, aes(x = book_number, y = series)) +
+  geom_image(aes(image = image_name), size = data2$scaled_index) +
+  geom_text(aes(label = label), vjust = -2.5, hjust = 0.5, size = 3, na.rm = TRUE)  +
+  theme_classic() +
+  scale_x_continuous(breaks = seq(1, max(data2$book_number), 1),
+                     labels = scales::ordinal_format()) + 
+  labs(title = "No of Goodreads Ratings Index per Book Series per Books Published",
+    x = "Book Number", y = "Series Name") +
+  theme(axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        axis.title = element_text(size = 10))
 
-
+#Save the plot
+ggsave( "goodreads_ratings_index_per_book_series.png",plot = gg, bg="white")
